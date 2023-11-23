@@ -1,0 +1,22 @@
+#!/bin/bash
+
+infile=$1
+file=${infile%.*}
+
+# Export diagram to plain XML
+drawio --export --format xml --uncompressed "$infile"
+
+#Get page names
+pg=($(xmlstarlet sel -t -v '//diagram/@name' "$file.xml"))
+echo "${pg[@]}"
+
+# Export each page as an PNG
+# Page index is zero based
+i=0
+for val in "${pg[@]}"
+do
+  drawio --export --page-index $i --output "${val}.png" "$file.drawio"
+  # echo "$i $val.png" 
+  i=$(expr $i + 1)
+done
+

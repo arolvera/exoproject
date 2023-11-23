@@ -1,0 +1,7 @@
+target_include_directories(${EXOPROJECT_TARGET} PUBLIC ./)
+add_subdirectory(anode)
+#add_subdirectory(buck28v)
+add_subdirectory(cmd)
+add_subdirectory(keeper)
+add_subdirectory(magnet)
+add_subdirectory(valve)

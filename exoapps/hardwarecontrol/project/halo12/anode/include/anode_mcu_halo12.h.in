@@ -1,0 +1,123 @@
+/*
+           Copyright (C) 2022 ExoTerra Corp - All Rights Reserved
+
+ Unauthorized copying of this file via any medium is strictly prohibited.
+ Proprietary and confidential.  Any unauthorized use, duplication, transmission,
+ distribution, or disclosure of this software is expressly forbidden.
+
+ This Copyright notice may not be removed or modified without prior written
+ consent of ExoTerra Corp.  ExoTerra Corp reserves the right to modify this 
+ software without notice.
+
+ ExoTerra Corp
+ 7640 S. Alkire Pl.
+ Littleton, CO 80127
+ USA
+
+ Voice:  +1 (720) 788-2010
+ http:   www.exoterracorp.com
+ email:  contact@exoterracorp.com
+*/
+
+#ifndef ANODE_MCU_H
+#define	ANODE_MCU_H
+
+#include "component_service.h"
+#include "ext_decl_define.h"
+#include "mcu_include.h"
+
+typedef enum
+{
+    QUADRATIC_BOOST,
+    TRANSITION_TO_QUAD_BOOST,
+    SINGLE_BOOST,
+    TRANSITION_TO_SINGLE_BOOST
+}anode_modes_t;
+
+// Data structure for anode specific global variables
+typedef struct
+{
+    component_control_t common;
+    uint16_t output_voltage;
+    uint16_t output_current;
+    uint16_t x_voltage;
+    uint16_t y_voltage;
+    uint16_t target_voltage;
+    uint16_t x_pwm_output;
+    uint16_t y_pwm_output;
+    anode_modes_t mode;
+    uint16_t raw_input_voltage;
+    uint16_t filtered_input_voltage;
+    uint16_t temperature;
+}anode_t;
+
+EXT_DECL anode_t anode;     // Global variable space
+
+// Different errors for the anode
+typedef enum
+{
+    ANODE_NO_ERROR,
+    ANODE_UNDER_CURRENT_ERROR,
+    ANODE_OVER_CURRENT_ERROR,
+    ANODE_UNDER_VOLTAGE_ERROR,
+    ANODE_OVER_VOLTAGE_ERROR,
+    ANODE_OVER_POWER_ERROR,
+    ANODE_VOLTAGE_IMBALANCE_ERROR,
+    ANODE_SPARK_TIMEOUT_ERROR,
+    ANODE_INPUT_VOLTAGE_LOW_ERROR
+} anode_error_t;
+
+// hardware scaling factors
+#define ANODE_COUNTS_PER_AMPERE          658
+#define ANODE_COUNTS_PER_VOLT_OUTPUT     5.65
+#define ANODE_COUNTS_PER_VOLT_INPUT      19.5
+#define ANODE_INPUT_TO_OUTPUT            (ANODE_COUNTS_PER_VOLT_OUTPUT / ANODE_COUNTS_PER_VOLT_INPUT)
+
+// safe operating limits and targets
+#define ANODE_OVER_CURRENT                  5.25 // Amperes
+#define ANODE_OVER_VOLTAGE                  625  // Volts
+#define ANODE_UNDER_VOLTAGE                 150  // Volts
+#define ANODE_MAX_OUTPUT_VOLTAGE            605  // Volts
+#define ANODE_MIN_OUTPUT_VOLTAGE            195  // Volts
+#define ANODE_POWER_GOOD_RANGE              5    // Volts
+#define ANODE_MAX_POWER                     1600 // Watts
+#define ANODE_MAX_POWER_SINGLE_BOOST        600  // Watts
+#define ANODE_MIN_INPUT_VOLTAGE             75   // Volts
+
+// safe operating limits and targets in counts
+#define ANODE_OVER_CURRENT_COUNTS                 ANODE_OVER_CURRENT * ANODE_COUNTS_PER_AMPERE
+#define ANODE_OVER_VOLTAGE_COUNTS                 ANODE_OVER_VOLTAGE * ANODE_COUNTS_PER_VOLT_OUTPUT
+#define ANODE_UNDER_VOLTAGE_COUNTS                ANODE_UNDER_VOLTAGE * ANODE_COUNTS_PER_VOLT_OUTPUT
+#define ANODE_MAX_V_OUT_COUNTS                    ANODE_MAX_OUTPUT_VOLTAGE * ANODE_COUNTS_PER_VOLT_OUTPUT
+#define ANODE_MIN_V_OUT_COUNTS                    ANODE_MIN_OUTPUT_VOLTAGE * ANODE_COUNTS_PER_VOLT_OUTPUT
+#define ANODE_POWER_GOOD_RANGE_COUNTS             ANODE_POWER_GOOD_RANGE * ANODE_COUNTS_PER_VOLT_OUTPUT
+#define ANODE_MAX_POWER_COUNTS_SQR                ANODE_MAX_POWER * ANODE_COUNTS_PER_AMPERE * ANODE_COUNTS_PER_VOLT_OUTPUT
+#define ANODE_MAX_POWER_SINGLE_BOOST_COUNTS_SQR   ANODE_MAX_POWER_SINGLE_BOOST * ANODE_COUNTS_PER_AMPERE * ANODE_COUNTS_PER_VOLT_OUTPUT
+#define ANODE_MIN_INPUT_VOLTAGE_COUNTS            ANODE_MIN_INPUT_VOLTAGE * ANODE_COUNTS_PER_VOLT_INPUT
+
+#define DECLARE_ANODE_HEALTH_ENTRY_0(_OUTPUT_VOLTAGE_, _OUTPUT_CURRENT_, _X_VOLTAGE_, _Y_VOLTAGE_) { \
+    {.data = _OUTPUT_VOLTAGE_, .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = _OUTPUT_CURRENT_, .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = _X_VOLTAGE_,      .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = _Y_VOLTAGE_,      .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = 0,                .size = HEALTH_ENTRY_SIZE_EOL}, \
+}
+
+#define DECLARE_ANODE_HEALTH_ENTRY_1(_STATE_, _ERROR_, _X_PWM_, _Y_PWM_, _MODE_) { \
+    {.data = _STATE_,                  .size = HEALTH_ENTRY_SIZE_1},   \
+    {.data = _ERROR_,                  .size = HEALTH_ENTRY_SIZE_1},   \
+    {.data = _X_PWM_,                  .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = _Y_PWM_,                  .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = _MODE_,                   .size = HEALTH_ENTRY_SIZE_1},   \
+    {.data = 0,                        .size = HEALTH_ENTRY_SIZE_EOL}, \
+}
+
+#define DECLARE_ANODE_HEALTH_ENTRY_2(_TEMP_, _RAW_INPUT_VOLTAGE_, _FILTERED_INPUT_VOLTAGE_) { \
+    {.data = _TEMP_,                   .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = _RAW_INPUT_VOLTAGE_,      .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = _FILTERED_INPUT_VOLTAGE_, .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = 0,                        .size = HEALTH_ENTRY_SIZE_EOL}, \
+}
+
+#endif	/* ANODE_MCU_H */
+

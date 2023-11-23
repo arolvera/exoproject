@@ -1,0 +1,1 @@
+add_subdirectory(${EXOPROJECT_APP}-${EXODRIVER_PROCESSOR})

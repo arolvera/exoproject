@@ -1,0 +1,27 @@
+
+For tiny icons on 4K screens from Windows10:
+eclipse.exe -> Properties -> Compatiblity -> Change high DPI settings -> Override high DPI scaling behavior -> System (Enhansed)
+     
+
+*********************************************************************************************************     
+How to modify the JLink environment to add the VA416xx to Seger’s supported devices:
+
+Modify by adding the tag below to C:/Program Files (x86)/SEGGER/JLink/JLinkDevices.xml or alternately copying the attached JlinkDevices.xml into the JLink directory.
+<Device>
+    <ChipInfo Vendor="Vorago" Name="VA416xx" WorkRAMAddr="0x20000000" WorkRAMSize="0x00008000" Core="JLINK_CORE_CORTEX_M4" />
+<FlashBankInfo Name="Internal FRAM" BaseAddr="0x00000000" MaxSize="0x00040000" Loader="Devices/Vorago/VA416_SPI_FRAM_256KB.FLM" LoaderType="FLASH_ALGO_TYPE_OPEN" AlwaysPresent="1"/>
+</Device>
+
+(You might wish to create a copy with the Name changed from VA416xx to VA416XX. It seems there are setups out there looking for each variant)
+
+Create C:/Program Files (x86)/SEGGER/JLink/Devices/Vorago/
+Copy file (VA416_SPI_FRAM_256KB.FLM) in Vorago.VA416xx.1.0.3.pack to C:/Program Files (x86)/SEGGER/JLink/Devices/Vorago/
+
+With a licensed Segger product, JFlash.exe is available. For JLink OD, JFlashLite.exe is available. 
+These products can be used to program the VA416xx completely within the Segger environment. 
+The Ozone debugger and SEGGER Embedded Studio are also available for use from the Segger website.
+     
+     
+*********************************************************************************************************** 
+
+   

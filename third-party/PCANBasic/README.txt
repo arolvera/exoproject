@@ -1,0 +1,1 @@
+libpcanbasic.so was compiled on x86-64 Ubuntu linux and should work on similar architectures.  If you need to rebuild it, pull the source code from peak - PCAN and follow the instructions for building/installing on Linux.

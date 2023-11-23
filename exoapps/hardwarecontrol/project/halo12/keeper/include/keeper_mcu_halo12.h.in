@@ -1,0 +1,106 @@
+/*
+           Copyright (C) 2022 ExoTerra Corp - All Rights Reserved
+
+ Unauthorized copying of this file via any medium is strictly prohibited.
+ Proprietary and confidential.  Any unauthorized use, duplication, transmission,
+ distribution, or disclosure of this software is expressly forbidden.
+
+ This Copyright notice may not be removed or modified without prior written
+ consent of ExoTerra Corp.  ExoTerra Corp reserves the right to modify this 
+ software without notice.
+
+ ExoTerra Corp
+ 7640 S. Alkire Pl.
+ Littleton, CO 80127
+ USA
+
+ Voice:  +1 (720) 788-2010
+ http:   www.exoterracorp.com
+ email:  contact@exoterracorp.com
+*/
+
+#ifndef KEEPER_MCU_H
+#define KEEPER_MCU_H
+
+#include "component_service.h"
+#include "ext_decl_define.h"
+#include "mcu_include.h"
+
+
+// Data structure for keeper specific global variables
+typedef struct
+{
+    component_control_t common;
+    uint16_t flyback_voltage;
+    uint16_t starter_voltage;
+    uint16_t output_current;
+    uint16_t target_voltage;
+    uint16_t target_current;
+    uint16_t pwm_output;
+    uint16_t temperature;
+    uint16_t output_current_filtered;
+    uint16_t starter_voltage_filtered;
+}keeper_t;
+
+EXT_DECL keeper_t keeper;     // Global variable space
+
+// Different errors for the keeper
+typedef enum
+{
+    KEEPER_NO_ERROR,
+    KEEPER_UNDER_CURRENT_ERROR,
+    KEEPER_OVER_CURRENT_ERROR,
+    KEEPER_OVER_VOLTAGE_STARTER_ERROR,        // the starter voltage
+    KEEPER_OVER_VOLTAGE_STARTUP_STATE_ERROR,  // the flyback voltage before the spark
+    KEEPER_OVER_VOLTAGE_ON_STATE_ERROR,       // the flyback voltage after the spark
+    KEEPER_OVER_POWER_ERROR,
+    KEEPER_SPARK_TIMEOUT_ERROR
+} keeper_error_t;
+
+// hardware scaling factors
+#define KEEPER_COUNTS_PER_AMPERE          657.8
+#define KEEPER_COUNTS_PER_VOLT_FLYBACK    19.43
+#define KEEPER_COUNTS_PER_VOLT_STARTER    3.190
+
+// safe operating limits and targets
+#define KEEPER_MAX_OUTPUT_CURRENT            3.5  // Amperes
+#define KEEPER_MAX_OUTPUT_VOLTAGE_FLYBACK    200  // Volts
+#define KEEPER_OVER_VOLTAGE_STARTER          750  // Volts
+#define KEEPER_VOLTAGE_STARTER               600  // Volts
+#define KEEPER_OVER_VOLTAGE_ON_STATE         90   // Volts
+#define KEEPER_POWER_GOOD_RANGE              0.05 // Amperes
+#define KEEPER_VOLTAGE_GOOD_RANGE            2.5  // Volts
+#define KEEPER_MAX_POWER                     100  // Watts
+#define KEEPER_STARTER_STARTING_RATIO        0.7  // Ratio
+
+// safe operating limits and targets in counts
+#define KEEPER_MAX_I_OUT_COUNTS             KEEPER_MAX_OUTPUT_CURRENT * KEEPER_COUNTS_PER_AMPERE
+#define KEEPER_MAX_V_OUT_COUNTS             KEEPER_MAX_OUTPUT_VOLTAGE_FLYBACK * KEEPER_COUNTS_PER_VOLT_FLYBACK
+#define KEEPER_OVER_VOLTAGE_COUNTS_STARTER  KEEPER_OVER_VOLTAGE_STARTER * KEEPER_COUNTS_PER_VOLT_STARTER
+#define KEEPER_OVER_VOLTAGE_COUNTS_ON       KEEPER_OVER_VOLTAGE_ON_STATE * KEEPER_COUNTS_PER_VOLT_FLYBACK
+#define KEEPER_POWER_GOOD_RANGE_COUNTS      KEEPER_POWER_GOOD_RANGE * KEEPER_COUNTS_PER_AMPERE
+#define KEEPER_VOLTAGE_GOOD_RANGE_COUNTS    KEEPER_VOLTAGE_GOOD_RANGE * KEEPER_COUNTS_PER_VOLT_FLYBACK
+#define KEEPER_MAX_POWER_COUNTS_SQR         KEEPER_MAX_POWER * KEEPER_COUNTS_PER_AMPERE * KEEPER_COUNTS_PER_VOLT_FLYBACK
+#define KEEPER_STARTER_TARGET_COUNTS        KEEPER_VOLTAGE_STARTER * KEEPER_COUNTS_PER_VOLT_STARTER
+
+#define DECLARE_KEEPER_HEALTH_ENTRY_0(_FLYBACK_VOLTAGE_, _STARTER_VOLTAGE_, _OUTPUT_CURRENT_) { \
+    {.data = _FLYBACK_VOLTAGE_, .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = _STARTER_VOLTAGE_, .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = _OUTPUT_CURRENT_,  .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = 0,                 .size = HEALTH_ENTRY_SIZE_EOL}, \
+}
+
+#define DECLARE_KEEPER_HEALTH_ENTRY_1(_STATE_, _ERROR_, _PWM_) { \
+    {.data = _STATE_,          .size = HEALTH_ENTRY_SIZE_1},   \
+    {.data = _ERROR_,          .size = HEALTH_ENTRY_SIZE_1},   \
+    {.data = _PWM_,            .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = 0,                .size = HEALTH_ENTRY_SIZE_EOL}, \
+}
+
+#define DECLARE_KEEPER_HEALTH_ENTRY_2(_TEMP_) { \
+    {.data = _TEMP_,                   .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = 0,                        .size = HEALTH_ENTRY_SIZE_EOL}, \
+}
+
+#endif	/* KEEPER_MCU_H */
+

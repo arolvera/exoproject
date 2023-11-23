@@ -1,0 +1,36 @@
+#Tried this at one point to get linking
+#set(CPU_FLAGS -mcpu=cortex-m4 -mthumb)
+#set(COMPILER_FLAGS -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -g3 -flto)
+
+#Used gcc-ar to enable -lto(linker optimization plugin)
+#set(CMAKE_AR  "arm-none-eabi-gcc-ar")
+#set(CMAKE_C_ARCHIVE_CREATE "<CMAKE_AR> qcs <TARGET> <LINK_FLAGS> <OBJECTS>")
+#set(CMAKE_C_ARCHIVE_FINISH   true)
+
+#add_compile_options(${CPU_FLAGS} ${COMPILER_FLAGS})
+#set(CMAKE_ASM_FLAGS "${CFLAGS} -mthumb-interwork -x assembler-with-cpp -DVA416xx")
+#set(CMAKE_ASM_FLAGS "-mcpu=cortex-m4 -mthumb -Og -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -
+flto -Wlogical-op  -g3 -x assembler-with-cpp -DVA416xx")
+
+################
+#ARM comp flags#
+################
+Setting PRINTF_FLOAT_ENABLE in platform/utilities/src/print_scan.h enables floating point support for the debug printf i
+mplemenations provided by NXP. Those are only available through debug_printf or PRINTF. This “mini library” only pro
+vides printf and scanf, but not sprintf. If you use regular printf, then printf is taken from the libc library provided 
+by the Linaro bare metal toolchain. The same is true when you use sprintf.
+
+Now newlib provided by the bare metal toolchain comes in two flavors: newlib and newlib-nano.
+
+The newlib-nano flavor has the option to enable floating point support in printf and scanf by using --specs=nano.specs -
+u _printf_float -u _scanf_float. You can add those options to the linker flags by extending the CMAKE_EXE_LINKER_FLAGS v
+ariable of CMakeLists.txt.
+
+The newlib flavor has support for float on all IO functions, including sprintf. To use the full newlib flavor you need t
+o remove the --specs=nano.specs from the linker flags (by removing that from CMAKE_EXE_LINKER_FLAGS).
+
+Note however this doubles the size of the firmware which does not fit into tightly couppled memory (TCM) anymore. A simp
+le hello world still fits into on-chip SRAM. You can change the location of the firmware by using -T MCIMX7D_M4_ocram.ld
+ in CMakeLists.txt.
+
+See also the readme file provided by the Linaro toolchain (in share/doc/gcc-arm-none-eabi/readme.txt).

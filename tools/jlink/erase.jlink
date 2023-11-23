@@ -1,0 +1,7 @@
+si 1
+reset
+halt
+erase
+reset 
+halt
+quit

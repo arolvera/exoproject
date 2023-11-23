@@ -1,0 +1,14 @@
+.vs
+*debug
+*release
+build
+dist
+.generated_files
+private
+*.orig
+*.mk
+*.bash
+Makefile-genesis.properties
+__pycache__
+images
+

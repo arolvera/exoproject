@@ -1,0 +1,144 @@
+//
+// Created by exolab on 1/25/23.
+//
+/* These must remain in KEY order - Alphabetical from A-Z then a-z */
+
+#include "storage/component_keys.h"
+#include "storage/memory-component/halo6/storage/storage_memory_layout.h"
+#include "storage/storage_class.h"
+#include "utils/macro_tools.h"
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
+extern fileops_t fops_eefc;
+
+component_map_t file_map[] = {
+    {UPDATE_IMAGE, {MASTER_IMAGE_FLASH_START, MASTER_IMAGE_FLASH_START + MASTER_IMAGE_AREA}, false, sm_erase16_write,
+        &fops_eefc},
+    {UNUSED_0, {-1, 0}, false, sm_erase16_write, &fops_eefc},
+
+    {ANODE_EXEC_HDR_1, {ANODE_EXECUTION_HEADER_1, ANODE_EXECUTION_HEADER_1 + EXECUTION_HEADER_SIZE}, false,
+     sm_overlay_write, &fops_eefc},
+    {ANODE_EXEC_HDR_2, {ANODE_EXECUTION_HEADER_2, ANODE_EXECUTION_HEADER_2 + EXECUTION_HEADER_SIZE}, false,
+     sm_overlay_write, &fops_eefc},
+    {ANODE_EXEC_HDR_3, {ANODE_EXECUTION_HEADER_3, ANODE_EXECUTION_HEADER_3 + EXECUTION_HEADER_SIZE}, false,
+     sm_overlay_write, &fops_eefc},
+
+    {ANODE_1, {ANODE_IMAGE_COPY_1, ANODE_IMAGE_COPY_1 + IMAGE_COPY_AREA}, false, sm_erase16_write, &fops_eefc},
+    {ANODE_2, {ANODE_IMAGE_COPY_2, ANODE_IMAGE_COPY_2 + IMAGE_COPY_AREA}, false, sm_erase16_write, &fops_eefc},
+    {ANODE_3, {ANODE_IMAGE_COPY_3, ANODE_IMAGE_COPY_3 + IMAGE_COPY_AREA}, false, sm_erase16_write, &fops_eefc},
+
+    {KEEPER_EXEC_HDR_1, {KEEPER_EXECUTION_HEADER_1, KEEPER_EXECUTION_HEADER_1 + EXECUTION_HEADER_SIZE}, false,
+     sm_overlay_write, &fops_eefc},
+    {KEEPER_EXEC_HDR_2, {KEEPER_EXECUTION_HEADER_2, KEEPER_EXECUTION_HEADER_2 + EXECUTION_HEADER_SIZE}, false,
+     sm_overlay_write, &fops_eefc},
+    {KEEPER_EXEC_HDR_3, {KEEPER_EXECUTION_HEADER_3, KEEPER_EXECUTION_HEADER_3 + EXECUTION_HEADER_SIZE}, false,
+     sm_overlay_write, &fops_eefc},
+
+    {KEEPER_1, {KEEPER_IMAGE_COPY_1, KEEPER_IMAGE_COPY_1 + IMAGE_COPY_AREA}, false, sm_erase16_write, &fops_eefc},
+    {KEEPER_2, {KEEPER_IMAGE_COPY_2, KEEPER_IMAGE_COPY_2 + IMAGE_COPY_AREA}, false, sm_erase16_write, &fops_eefc},
+    {KEEPER_3, {KEEPER_IMAGE_COPY_3, KEEPER_IMAGE_COPY_3 + IMAGE_COPY_AREA}, false, sm_erase16_write, &fops_eefc},
+
+#if STORAGE_LAYOUT == STORAGE_LAYOUT_V1
+
+    {OUTER_MAGNET_EXEC_HDR_1, {OUTER_MAGNET_EXECUTION_HEADER_1, OUTER_MAGNET_EXECUTION_HEADER_1 +
+    EXECUTION_HEADER_SIZE}, false, sm_overlay_write, &fops_eefc},
+    {OUTER_MAGNET_EXEC_HDR_2, {OUTER_MAGNET_EXECUTION_HEADER_2, OUTER_MAGNET_EXECUTION_HEADER_2 + EXECUTION_HEADER_SIZE}, false, sm_overlay_write, &fops_eefc},
+    {OUTER_MAGNET_EXEC_HDR_3, {OUTER_MAGNET_EXECUTION_HEADER_3, OUTER_MAGNET_EXECUTION_HEADER_3 + EXECUTION_HEADER_SIZE}, false, sm_overlay_write, &fops_eefc},
+
+    {OUTER_MAGNET_1, {OUTER_MAGNET_IMAGE_COPY_1, OUTER_MAGNET_IMAGE_COPY_1 + IMAGE_COPY_AREA}, false, sm_erase16_write, &fops_eefc},
+    {OUTER_MAGNET_2, {OUTER_MAGNET_IMAGE_COPY_2, OUTER_MAGNET_IMAGE_COPY_2 + IMAGE_COPY_AREA}, false, sm_erase16_write, &fops_eefc},
+    {OUTER_MAGNET_3, {OUTER_MAGNET_IMAGE_COPY_3, OUTER_MAGNET_IMAGE_COPY_3 + IMAGE_COPY_AREA}, false, sm_erase16_write, &fops_eefc},
+
+    {APP_RECOVERY_EXEC_HDR_1, {APP_RECOVERY_EXECUTION_HEADER_1, APP_RECOVERY_EXECUTION_HEADER_1 + EXECUTION_HEADER_SIZE}, false, sm_overlay_write, &fops_eefc},
+    {APP_RECOVERY_EXEC_HDR_2, {APP_RECOVERY_EXECUTION_HEADER_2, APP_RECOVERY_EXECUTION_HEADER_2 + EXECUTION_HEADER_SIZE}, false, sm_overlay_write, &fops_eefc},
+    {APP_RECOVERY_EXEC_HDR_3, {APP_RECOVERY_EXECUTION_HEADER_3, APP_RECOVERY_EXECUTION_HEADER_3 + EXECUTION_HEADER_SIZE}, false, sm_overlay_write, &fops_eefc},
+
+    {APP_RECOVERY_1, {APP_RECOVERY_IMAGE_COPY_1, APP_RECOVERY_IMAGE_COPY_1 + IMAGE_COPY_AREA}, false, sm_erase16_write, &fops_eefc},
+    {APP_RECOVERY_2, {APP_RECOVERY_IMAGE_COPY_2, APP_RECOVERY_IMAGE_COPY_2 + IMAGE_COPY_AREA}, false, sm_erase16_write, &fops_eefc},
+    {APP_RECOVERY_3, {APP_RECOVERY_IMAGE_COPY_3, APP_RECOVERY_IMAGE_COPY_3 + IMAGE_COPY_AREA}, false, sm_erase16_write, &fops_eefc},
+
+#elif STORAGE_LAYOUT == STORAGE_LAYOUT_V2
+
+    {OUTER_MAGNET_EXEC_HDR_1, {MAGNET_EXECUTION_HEADER_1, MAGNET_EXECUTION_HEADER_1 + EXECUTION_HEADER_SIZE}, false,
+     sm_overlay_write, &fops_eefc},
+    {OUTER_MAGNET_EXEC_HDR_2, {MAGNET_EXECUTION_HEADER_2, MAGNET_EXECUTION_HEADER_2 + EXECUTION_HEADER_SIZE}, false,
+     sm_overlay_write, &fops_eefc},
+    {OUTER_MAGNET_EXEC_HDR_3, {MAGNET_EXECUTION_HEADER_3, MAGNET_EXECUTION_HEADER_3 + EXECUTION_HEADER_SIZE}, false,
+     sm_overlay_write, &fops_eefc},
+
+    {OUTER_MAGNET_1, {MAGNET_IMAGE_COPY_1, MAGNET_IMAGE_COPY_1 + IMAGE_COPY_AREA}, false, sm_erase16_write, &fops_eefc},
+    {OUTER_MAGNET_2, {MAGNET_IMAGE_COPY_2, MAGNET_IMAGE_COPY_2 + IMAGE_COPY_AREA}, false, sm_erase16_write, &fops_eefc},
+    {OUTER_MAGNET_3, {MAGNET_IMAGE_COPY_3, MAGNET_IMAGE_COPY_3 + IMAGE_COPY_AREA}, false, sm_erase16_write, &fops_eefc},
+
+    {USER_CONFIG_VAR_EXEC_HDR_1,
+     {USER_CONFIG_VAR_EXECUTION_HEADER_1, USER_CONFIG_VAR_EXECUTION_HEADER_1 + EXECUTION_HEADER_SIZE}, false,
+     sm_overlay_write, &fops_eefc},
+    {USER_CONFIG_VAR_EXEC_HDR_2,
+     {USER_CONFIG_VAR_EXECUTION_HEADER_2, USER_CONFIG_VAR_EXECUTION_HEADER_2 + EXECUTION_HEADER_SIZE}, false,
+     sm_overlay_write, &fops_eefc},
+    {USER_CONFIG_VAR_EXEC_HDR_3,
+     {USER_CONFIG_VAR_EXECUTION_HEADER_3, USER_CONFIG_VAR_EXECUTION_HEADER_3 + EXECUTION_HEADER_SIZE}, false,
+     sm_overlay_write, &fops_eefc},
+
+    {USER_CONFIG_VAR_1, {USER_CONFIG_VAR_IMAGE_COPY_1, USER_CONFIG_VAR_IMAGE_COPY_1 + USER_CONFIG_VAR_IMAGE_COPY_SIZE},
+     false, sm_overlay_write, &fops_eefc},
+    {USER_CONFIG_VAR_2, {USER_CONFIG_VAR_IMAGE_COPY_2, USER_CONFIG_VAR_IMAGE_COPY_2 + USER_CONFIG_VAR_IMAGE_COPY_SIZE},
+     false, sm_overlay_write, &fops_eefc},
+    {USER_CONFIG_VAR_3, {USER_CONFIG_VAR_IMAGE_COPY_3, USER_CONFIG_VAR_IMAGE_COPY_3 + USER_CONFIG_VAR_IMAGE_COPY_SIZE},
+     false, sm_overlay_write, &fops_eefc},
+
+#endif // STORAGE_LAYOUT
+
+    {VALVES_EXEC_HDR_1, {VALVES_EXECUTION_HEADER_1, VALVES_EXECUTION_HEADER_1 + EXECUTION_HEADER_SIZE}, false,
+     sm_overlay_write, &fops_eefc},
+    {VALVES_EXEC_HDR_2, {VALVES_EXECUTION_HEADER_2, VALVES_EXECUTION_HEADER_2 + EXECUTION_HEADER_SIZE}, false,
+     sm_overlay_write, &fops_eefc},
+    {VALVES_EXEC_HDR_3, {VALVES_EXECUTION_HEADER_3, VALVES_EXECUTION_HEADER_3 + EXECUTION_HEADER_SIZE}, false,
+     sm_overlay_write, &fops_eefc},
+
+    {VALVES_1, {VALVES_IMAGE_COPY_1, VALVES_IMAGE_COPY_1 + IMAGE_COPY_AREA}, false, sm_erase16_write, &fops_eefc},
+    {VALVES_2, {VALVES_IMAGE_COPY_2, VALVES_IMAGE_COPY_2 + IMAGE_COPY_AREA}, false, sm_erase16_write, &fops_eefc},
+    {VALVES_3, {VALVES_IMAGE_COPY_3, VALVES_IMAGE_COPY_3 + IMAGE_COPY_AREA}, false, sm_erase16_write, &fops_eefc},
+
+    {SYSTEM_CONTROL_EXEC_HDR_1,
+     {SYSTEM_CONTROL_EXECUTION_HEADER_1, SYSTEM_CONTROL_EXECUTION_HEADER_1 + EXECUTION_HEADER_SIZE}, false,
+     sm_overlay_write, &fops_eefc},
+    {SYSTEM_CONTROL_EXEC_HDR_2,
+     {SYSTEM_CONTROL_EXECUTION_HEADER_2, SYSTEM_CONTROL_EXECUTION_HEADER_2 + EXECUTION_HEADER_SIZE}, false,
+     sm_overlay_write, &fops_eefc},
+    {SYSTEM_CONTROL_EXEC_HDR_3,
+     {SYSTEM_CONTROL_EXECUTION_HEADER_3, SYSTEM_CONTROL_EXECUTION_HEADER_3 + EXECUTION_HEADER_SIZE}, false,
+     sm_overlay_write, &fops_eefc},
+
+    {SYSTEM_CONTROL_1, {SYSTEM_CONTROL_IMAGE_COPY_1, SYSTEM_CONTROL_IMAGE_COPY_1 + SYSTEM_CONTROL_COPY_AREA}, false,
+     sm_erase16_write, &fops_eefc},
+    {SYSTEM_CONTROL_2, {SYSTEM_CONTROL_IMAGE_COPY_2, SYSTEM_CONTROL_IMAGE_COPY_2 + SYSTEM_CONTROL_COPY_AREA}, false,
+     sm_erase16_write, &fops_eefc},
+    {SYSTEM_CONTROL_3, {SYSTEM_CONTROL_IMAGE_COPY_3, SYSTEM_CONTROL_IMAGE_COPY_3 + SYSTEM_CONTROL_COPY_AREA}, false,
+     sm_erase16_write, &fops_eefc},
+
+    {BOOTLOADER_EXEC_HDR_1, {BOOTLOADER_EXECUTION_HEADER_1, BOOTLOADER_EXECUTION_HEADER_1 + EXECUTION_HEADER_SIZE},
+     false, sm_overlay_write, &fops_eefc},
+    {BOOTLOADER_EXEC_HDR_2, {BOOTLOADER_EXECUTION_HEADER_2, BOOTLOADER_EXECUTION_HEADER_2 + EXECUTION_HEADER_SIZE},
+     false, sm_overlay_write, &fops_eefc},
+    {BOOTLOADER_EXEC_HDR_3, {BOOTLOADER_EXECUTION_HEADER_3, BOOTLOADER_EXECUTION_HEADER_3 + EXECUTION_HEADER_SIZE},
+     false, sm_overlay_write, &fops_eefc},
+
+    {BOOTLOADER_1, {BOOTLOADER_IMAGE_COPY_1, BOOTLOADER_IMAGE_COPY_1 + BOOTLOADER_AREA}, false, sm_erase16_write, &fops_eefc},
+    {BOOTLOADER_2, {BOOTLOADER_IMAGE_COPY_2, BOOTLOADER_IMAGE_COPY_2 + BOOTLOADER_AREA}, false, sm_erase16_write, &fops_eefc},
+    {BOOTLOADER_3, {BOOTLOADER_IMAGE_COPY_3, BOOTLOADER_IMAGE_COPY_3 + BOOTLOADER_AREA}, false, sm_erase16_write, &fops_eefc},
+
+    {APPLICATION_EXE, {APPLICATION, APPLICATION + SYSTEM_CONTROL_COPY_AREA}, false, sm_erase16_write, &fops_eefc},
+
+    {CONDITION_STATUS, {CONDITION_STAT_AREA, CONDITION_STAT_AREA + CONDITION_STAT_SIZE}, false, sm_overlay_write, &fops_eefc},
+
+    {TC_BOOTLOADER, {BOOT_LOADER, BOOT_LOADER + BOOTLOADER_AREA}, false, sm_erase16_write, &fops_eefc},
+
+    {UPDATER_TRIGGER, {UPDATER_TRIGGER_AREA, UPDATER_TRIGGER_AREA + IFLASH_PAGE_SIZE}, false, sm_overlay_write, &fops_eefc},
+
+    {LOCKOUT_TIMER, {CLIENT_LOCKOUT_TIMER, CLIENT_LOCKOUT_TIMER + LOCKOUT_NVM_SIZE}, false, sm_erase16_write, &fops_eefc},
+
+};
+const size_t FILE_MAP_SIZE = SIZEOF_ARRAY(file_map);

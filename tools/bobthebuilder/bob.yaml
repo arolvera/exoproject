@@ -1,0 +1,41 @@
+halo12_hwcntrl:
+  EXOPROJECT_COMPILER_FILE: "project-configs/halo12-va41630-xenon-silver-boeing/compiler_flags.cmake"
+  EXOPROJECT_CONFIG_FILE: "project-configs/halo12-va41630-xenon-silver-boeing/hardware_control_proj_config.cmake"
+  BUILD_DIR: "halo12_hwcntrl"
+
+halo12_thcntrl:
+  EXOPROJECT_COMPILER_FILE: "project-configs/halo12-va41630-xenon-silver-boeing/compiler_flags.cmake"
+  EXOPROJECT_CONFIG_FILE: "project-configs/halo12-va41630-xenon-silver-boeing/thruster_control_proj_config.cmake"
+  BUILD_DIR: "halo12_thcntrl"
+  MANIFEST_FILENAME: "thruster_control_manifest.txt"
+  MANIFEST_EXECUTABLE: "/tmp/cmake-build-halo12_thcntrl/bin/system-control-halo12-va41630-xenon-silver-boeing.bin"
+  MANIFEST_VERSION_PATH: "exoapps/system-control/halo12-va41630/project-shared/include/thruster_control_version.h"
+  MANIFEST_MAGIC_NUM_PATH: ""
+  MANIFEST_DEVICE_ID: 0
+  
+  
+halo12_master_img_constructor:
+  EXOPROJECT_COMPILER_FILE: "project-configs/halo12-va41630-xenon-silver-boeing/compiler_flags.cmake"
+  EXOPROJECT_CONFIG_FILE: "project-configs/halo12-va41630-xenon-silver-boeing/master_image_constructor_config.cmake"
+  BUILD_DIR: "halo12_master_img_constructor"
+  EXTRA_FLAGS: "-DBUILD_MASTER_IMAGE_CONSTRUCTOR:BOOL=TRUE"
+
+# halo6_bootloader:
+#   EXOPROJECT_COMPILER_FILE: "project-configs/system-control-samv71/compiler_flags.cmake"
+#   EXOPROJECT_CONFIG_FILE: "project-configs/system-control-samv71/halo6_bootloader_proj_config.cmake"
+#   BUILD_DIR: "halo6_bootloader"
+
+# halo6_system_control:
+#   EXOPROJECT_COMPILER_FILE: "project-configs/system-control-samv71/compiler_flags.cmake"
+#   EXOPROJECT_CONFIG_FILE: "project-configs/system-control-samv71/halo6_system_control_proj_config.cmake"
+#   BUILD_DIR: "halo6_syscontrol"
+
+# fcp_bootloader:
+#   EXOPROJECT_COMPILER_FILE: "project-configs/system-control-samv71/compiler_flags.cmake"
+#   EXOPROJECT_CONFIG_FILE: "project-configs/system-control-samv71/fcp_bootloader_proj_config.cmake"
+#   BUILD_DIR: "fcp_bootloader"
+
+# fcp_system_control:
+#   EXOPROJECT_COMPILER_FILE: "project-configs/system-control-samv71/compiler_flags.cmake"
+#   EXOPROJECT_CONFIG_FILE: "project-configs/system-control-samv71/fcp_system_control_proj_config.cmake"
+#   BUILD_DIR: "fcp_syscontrol"

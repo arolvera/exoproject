@@ -1,0 +1,17 @@
+*.o
+*.d
+*.elf
+*.hex
+*.map
+*build*/**
+cmake-build-*/**
+.vscode/**
+.project
+.settings/**
+**/*.swp
+.idea/*
+*.orig
+!.idea/cmake.xml
+!.idea/runConfigurations/
+
+

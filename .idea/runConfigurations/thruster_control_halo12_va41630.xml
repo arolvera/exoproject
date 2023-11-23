@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="thruster-control-halo12-va41630" type="com.jetbrains.cidr.embedded.customgdbserver.type" factoryName="com.jetbrains.cidr.embedded.customgdbserver.factory" PROGRAM_PARAMS="-select USB -device VA416XX -endian little -if SWD -speed 2000  -LocalhostOnly -vd -jlinkscriptfile tools/jlink/JLinkSettings.JLinkScript" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="bootloaders-halo12-va41630-xenon-silver-boeing" TARGET_NAME="system-control-halo12-va41630-xenon-silver-boeing" CONFIG_NAME="system-control-va41630" version="1" RUN_TARGET_PROJECT_NAME="bootloaders-halo12-va41630-xenon-silver-boeing" RUN_TARGET_NAME="system-control-halo12-va41630-xenon-silver-boeing">
+    <custom-gdb-server version="1" gdb-connect="localhost:2331" executable="/opt/SEGGER/JLink/JLinkGDBServerCLExe" warmup-ms="1000" download-type="ALWAYS" reset-cmd="monitor reset" reset-type="AFTER_DOWNLOAD">
+      <debugger kind="GDB" isBundled="true" />
+    </custom-gdb-server>
+    <method v="2">
+      <option name="CLION.COMPOUND.BUILD" enabled="true" />
+    </method>
+  </configuration>
+</component>

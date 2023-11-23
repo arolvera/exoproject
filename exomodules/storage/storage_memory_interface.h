@@ -1,0 +1,106 @@
+/**
+ * @file    storage_memory_interface.h
+ *
+ * @brief   ??? Defines APIs based on platform being compiled for, currently supported
+ * and tested are the Linux host and the SAMV71 target.  Also defined here is the
+ * component key map.  This is what ties together the atmega data files and
+ * their meta data.
+ *
+ * This seems no longer relavent for Halo 12, especially if we keep separate from
+ * Halo 6 nd FCP.
+ *
+ * @copyright   Copyright (C) 2023 ExoTerra Corp - All Rights Reserved
+ *
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * proprietary and confidential.  Any unauthorized use, duplication, transmission,
+ * distribution, or disclosure of this software is expressly forbidden.
+ *
+ * This Copyright notice may not be removed or modified without prior written
+ * consent of ExoTerra Corp.  ExoTerra Corp reserves the right to modify this
+ * software without notice.
+ */
+
+#ifndef STORAGE_MEMORY_INTERFACE_H
+#define STORAGE_MEMORY_INTERFACE_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdint.h>
+
+#include "storage/component_keys.h"
+#include "ext_decl_define.h"
+#include "magic_numbers.h"
+#include "storage/mem_comp_map.h"
+#include "storage/storage_memory.h"
+
+// ToDo: Delete commented code
+
+//typedef struct component_key_map {
+//    /* the bin file key */
+//    const char *image_base_key;
+//    /* the execution header */
+//    const char *exhdr_base_key;
+//    /* Exe header magic number */
+//    uint32_t magic;
+//} component_key_map_t;
+
+/* This structure may used when you do not care where the memory is, or if the
+ * memory is shared.  This is what you want if you are using the master
+ * component list and just want open a file.
+ *
+ * DO NOT use this for any memory scrubbing or any place where you are iterating
+ * over REAL Memory regions
+ *
+ * These elements must be in component_t enum order and have COMPONENT_MAXIMUM elements
+ */
+//extern component_key_map_t component_map[];
+//extern const int COMPONENT_MAP_ARRAY_SIZE;
+
+#define REDUNDANT_REGION_MASK ((1 << MEMCOMPONENT_MAX) - 1)
+
+/*
+ * Use this structure for all memory scrubbing and recover routines
+ *
+ * It CAN and SHOULD be used whenever iterating over the mem_component enum
+ * and the ORDER of REAL memory areas matters.
+ *
+ *  These elements must be in mem_component_t enum order and have MEMCOMPONENT_MAX elements
+ */
+//extern component_key_map_t mem_component_map[];
+//extern const int MEM_COMPONENT_MAP_ARRAY_SIZE;
+
+#if defined(BUILD_MASTER_IMAGE_CONSTRUCTOR)
+// filesystem instead of flash
+#define storage_memory_read  read
+#define storage_memory_write write
+#define storage_memory_lseek lseek
+#define storage_memory_fstat fstat
+#define storage_memory_open  open
+#define storage_memory_close close
+#define storage_memory_stat  stat
+
+#else
+#include "storage_memory.h"
+#define storage_memory_read  sm_read
+#define storage_memory_write sm_write
+#define storage_memory_lseek sm_lseek
+#define storage_memory_fstat sm_fstat
+#define storage_memory_open  sm_open
+#define storage_memory_close sm_close
+#define storage_memory_stat  sm_stat
+#endif
+
+
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* EXAMPLE_FILE_NAME_H */
+

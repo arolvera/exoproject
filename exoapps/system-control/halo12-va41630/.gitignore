@@ -1,0 +1,13 @@
+*.o
+*.d
+*.elf
+*.hex
+*.map
+*build*/**
+cmake-build-*/**
+.idea/**
+.vscode/**
+.project
+.settings/**
+**/*.swp
+*.orig

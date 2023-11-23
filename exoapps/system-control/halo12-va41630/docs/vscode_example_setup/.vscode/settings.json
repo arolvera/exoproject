@@ -1,0 +1,11 @@
+{
+    "workbench.activityBar.visible": true,
+    "debug.toolBarLocation": "docked",
+    "editor.minimap.enabled": false,
+    "cortex-debug.armToolchainPath": "${env.XCOMP_PATH}",
+    "cortex-debug.JLinkGDBServerPath": "/opt/SEGGER/JLinkGDBServer",
+    "cmake.buildDirectory": "${workspaceFolder}/cmake-vscode-build",
+    "cmake.configureSettings": {
+        "BOARD_PATH":"${workspaceFolder}/boards/HALO12",
+    },
+}

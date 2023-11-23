@@ -1,0 +1,96 @@
+/*
+           Copyright (C) 2022 ExoTerra Corp - All Rights Reserved
+
+ Unauthorized copying of this file via any medium is strictly prohibited.
+ Proprietary and confidential.  Any unauthorized use, duplication, transmission,
+ distribution, or disclosure of this software is expressly forbidden.
+
+ This Copyright notice may not be removed or modified without prior written
+ consent of ExoTerra Corp.  ExoTerra Corp reserves the right to modify this 
+ software without notice.
+
+ ExoTerra Corp
+ 7640 S. Alkire Pl.
+ Littleton, CO 80127
+ USA
+
+ Voice:  +1 (720) 788-2010
+ http:   www.exoterracorp.com
+ email:  contact@exoterracorp.com
+*/
+
+#ifndef VALVE_MCU_H
+#define VALVE_MCU_H
+
+#include "component_service.h"
+#include "ext_decl_define.h"
+#include "mcu_include.h"
+
+// Data structure for valve specific global variables
+typedef struct
+{
+    component_control_t common;
+    uint16_t tank_pressure;
+    uint16_t cathode_pressure;
+    uint16_t anode_pressure;
+    uint16_t regulator_pressure;
+    uint16_t cat_high_flow_voltage;
+    uint16_t temperature;
+    uint16_t anode_flow_setpoint;
+    uint16_t cat_high_flow_setpoint;
+    uint16_t cat_low_flow_setpoint;
+    uint16_t anode_dac;
+    uint16_t cat_low_flow_dac;
+}valve_t;
+
+EXT_DECL valve_t valve;     // Global variable space
+
+// Different errors for the valves
+// No valve specific errors yet, but maybe there will be some in the future
+typedef enum
+{
+    VALVE_NO_ERROR,
+} valve_error_t;
+
+#define CATHODE_LF_DAC  0
+#define ANODE_FLOW_DAC  1
+
+// hardware scaling factors
+#define VALVE_HIGH_PRESSURE_SENSOR_SCALE  0.632
+#define VALVE_LOW_PRESSURE_SENSOR_SCALE   63.15
+#define VALVE_VOLTAGE_SCALE               247.4
+// @fixme these are the thermistor properties for halo6 and need to be updated
+#define VALVE_THERMISTOR_BETA             3419    // property of NTC thermistors
+#define VALVE_THERMISTOR_R_NOUGHT         1000    // resistance at 25C in ohms
+
+// safe operating limits and targets
+#define VALVE_MAX_PRESSURE                50   // PSI
+#define VALVE_MAX_HIGH_FLOW               1000 // permil (percent times ten)
+
+// safe operating limits and targets in counts
+#define VALVE_MAX_PRESSURE_COUNTS         VALVE_MAX_PRESSURE * VALVE_LOW_PRESSURE_SENSOR_SCALE
+
+#define DECLARE_VALVE_HEALTH_ENTRY_0(_TANK_PRES_, _CAT_PRES_, _ANODE_PRES_, _REG_PRES_) { \
+    {.data = _TANK_PRES_,  .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = _CAT_PRES_,   .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = _ANODE_PRES_, .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = _REG_PRES_,   .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = 0, .size = HEALTH_ENTRY_SIZE_EOL}, \
+}
+
+#define DECLARE_VALVE_HEALTH_ENTRY_1(_STATE_, _ERROR_, _ANODE_DAC_, _CAT_LF_DAC_) { \
+    {.data = _STATE_,       .size = HEALTH_ENTRY_SIZE_1},   \
+    {.data = _ERROR_,       .size = HEALTH_ENTRY_SIZE_1},   \
+    {.data = _ANODE_DAC_,   .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = _CAT_LF_DAC_,  .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = 0, .size = HEALTH_ENTRY_SIZE_EOL}, \
+}
+
+#define DECLARE_VALVE_HEALTH_ENTRY_2(_TEMP_, _CAT_HF_V_) { \
+    {.data = _TEMP_,       .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = _CAT_HF_V_,   .size = HEALTH_ENTRY_SIZE_2},   \
+    {.data = 0, .size = HEALTH_ENTRY_SIZE_EOL}, \
+}
+
+#endif	/* VALVE_MCU_H */
+

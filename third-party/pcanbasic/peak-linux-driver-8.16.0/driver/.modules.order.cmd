@@ -1,0 +1,1 @@
+cmd_/home/marvin/projects/exoproject/third-party/pcanbasic/peak-linux-driver-8.16.0/driver/modules.order := {   echo /home/marvin/projects/exoproject/third-party/pcanbasic/peak-linux-driver-8.16.0/driver/pcan.ko; :; } | awk '!x[$$0]++' - > /home/marvin/projects/exoproject/third-party/pcanbasic/peak-linux-driver-8.16.0/driver/modules.order

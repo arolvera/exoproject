@@ -1,0 +1,176 @@
+#include "thruster_control.h"
+#define DECLARE_GLOBALS
+#include "sequence/control_sequence.h"
+#undef DECLARE_GLOBALS
+
+/* Interval in between health checks */
+#define COND_MONITOR_WAIT_MS       250
+/* Number of loops per second */
+#define COND_MONITOR_LOOPS_SEC   (1000 / COND_MONITOR_WAIT_MS)
+/* Time to let thruster settle after throttling */
+#define COND_THROTTLE_SETTLE_MS   5000
+/* Number of loops to wait for the throttle point to settle */
+#define COND_THROTTLE_SETTLE_CNT (COND_THROTTLE_SETTLE_MS / COND_MONITOR_WAIT_MS)
+/* Number of monitor loops before writing status out to NVM (60 seconds) */
+#define COND_STATUS_SAVE_LOOPS   (COND_MONITOR_LOOPS_SEC * 60)
+/* Delay ms after error and before auto retry */
+#define COND_FAIL_RETRY_DELAY_MS (60000)
+#define COND_AUTO_RETRY      1  /* Enable/Disable Auto Retry   */
+#define COND_AUTO_RETRY_MAX 10  /* Max number of  Auto Retries */
+/* The second step is the keeper, past this step we depend on 'things', for
+ * example, the past the first keeper step the keeper has to be on already, and
+ * for the first anode, the keeper has to be on.  We do not have logic to
+ * fulfill these prerequisites at the time of this writing.
+ */
+#define COND_AUTO_RETRY_STEP_MAX  2  /* The step past which we do not Auto Retry */
+
+#define CONDITIONING_KEEPER_VOLTAGE_LIMIT       45000
+
+#define CONDITIONING_ANODE_VOLTAGE_LIMIT       275000
+#define CONDITIONING_ANODE_CURRENT_LIMIT         2000
+#define CONDITIONING_ANODE_POWER_LIMIT         300000 /* Turn it off now      */
+#define CONDITIONING_ANODE_POWER_HIGH_LIMIT    280000 /* Throttle down        */
+#define CONDITIONING_ANODE_POWER_LOW_LIMIT1    100000 /* Throttle up 1st seq  */
+#define CONDITIONING_ANODE_POWER_LOW_LIMIT2    135000 /* Throttle up 2nd      */
+
+#define CONDITIONING_INPUT_CURRENT_LIMIT         15.0
+#define CONDITIONING_INPUT_POWER_LIMIT          355.0
+
+#define SEQUENCE_MAX_STEPS_CONDITION  SEQUENCE_MAX_STEPS
+
+#define NAME_CONDITION_MAGNETS "MAGNET_COND"
+#define MAGNET_DELAY (3600 * DELAY_FACTOR)
+static sequence_array_t sequence_cond_magnets[SEQUENCE_MAX_STEPS_CONDITION] = {
+    0x0504090A00000001,
+    0x0501090A00002710,
+#if __DEBUG
+    /* Only delay 10 seconds */
+    0x0001020A00002710,
+#else
+    0x0001090A000DBBA0,
+#endif
+    0x0501090A00000000,
+    0x0301090A000007D0,
+    0x0302090A000001B8,
+    0x0303090A00000000,
+    0x0001090A000003E8,
+    0x0305090A00000000,
+    0x0001090A00000FA0,
+    0, /* EOL */
+};
+
+#define NAME_CONDITION_KEEPER1 "Keeper1 Condition"
+#define KEEPER1_DELAY (3600 * DELAY_FACTOR)
+static sequence_array_t sequence_cond_keeper1[SEQUENCE_MAX_STEPS_CONDITION] = {
+    0x0504090A00000001,
+    0x0304090A00000000,
+    0x0101090A00015F90,
+    0x0102090A00000384,
+    0x0501090A00002710,
+    0x0502090A000182B8,
+    0x0001090A00001770,
+    0x0106090B0000001E,
+    0x0001090A000007D0,
+    0x0502090A00000000,
+    0x0001090A00002710,
+    0x0105090A00000000,
+    0x0102090A000002BC,
+    0x0301090A000007D0,
+    0x0302090A000001B8,
+    0x0303090A00000000,
+    0x0001090A000003E8,
+    0x0305090A00000000,
+    0x0001090A000005DC,
+    0x0308090A00000000,
+    0, /* EOL */
+};
+
+
+#define NAME_CONDITION_KEEPER2 "Keeper2 Condition"
+#define KEEPER2_DELAY (1800 * DELAY_FACTOR)
+static sequence_array_t sequence_cond_keeper2[SEQUENCE_MAX_STEPS_CONDITION] = {
+    0x0301090A000007D0,
+    0x0302090A000001B8,
+    0x0303090A00000000,
+    0x0001090A000003E8,
+    0x0305090A00000000,
+    0x0001090A000005DC,
+    0x0308090A00000000,
+    0x0102090A00000384,
+    0, /* EOL */
+};
+
+#define NAME_CONDITION_KEEPER3 "Keeper3 Condition"
+#define KEEPER3_DELAY (1800 * DELAY_FACTOR)
+static sequence_array_t sequence_cond_keeper3[SEQUENCE_MAX_STEPS_CONDITION] = {
+    0x0301090A000007D0,
+    0x0302090A000001B8,
+    0x0303090A00000000,
+    0x0001090A000003E8,
+    0x0305090A00000000,
+    0x0001090A000005DC,
+    0x0308090A00000000,
+    0x0102090A000004B0,
+    0, /* EOL */
+};
+
+#define NAME_CONDITION_KEEPER4 "Keeper4 Condition"
+#define KEEPER4_DELAY (3600 * DELAY_FACTOR)
+static sequence_array_t sequence_cond_keeper4[SEQUENCE_MAX_STEPS_CONDITION] = {
+    0x0301090A000007D0,
+    0x0302090A000001B8,
+    0x0303090A00000000,
+    0x0001090A000003E8,
+    0x0305090A00000000,
+    0x0001090A000005DC,
+    0x0308090A00000000,
+    0x0102090A000005DC,
+    0, /* EOL */
+};
+
+
+#define NAME_CONDITION_ANODE1 "Anode1 Condition"
+#define ANODE1_DELAY (1800 * DELAY_FACTOR)
+static sequence_array_t sequence_cond_anode1[SEQUENCE_MAX_STEPS_CONDITION] =
+    {
+#if BUILD_CONFIG_IS_KRYPTON
+        0x01020A0C00000898,
+    0x00030A0C00000004,
+    0x05050A0C00000000,
+    0x02070A0C00000000,
+    0x02080A0C00000000,
+    0x03060A0C00000000,
+    0x03070A0C00000000,
+    0x03030A0C00000000,
+    0x00010A0C000001F4,
+    0x03050A0C00000000,
+    0x05060A0C00000000,
+    0x00010A0C000007D0,
+    0x03080A0C00000000,
+    0x02090A0D00000005,
+    0x00010A0C000007D0,
+    0x00040A0C00000001,
+    0, /* EOL   */
+#else /* Xenon  */
+        0x01020A0C000005DC,
+        0x00030A0C00000001,
+        0x05050A0C00000000,
+        0x02070A0C00000000,
+        0x02080A0C00000000,
+        0x03060A0C00000000,
+        0x03070A0C00000000,
+        0x03030A0C00000000,
+        0x00010A0C000001F4,
+        0x03050A0C00000000,
+        0x05060A0C00000000,
+        0x00010A0C000007D0,
+        0x03080A0C00000000,
+        0x02090A0D00000005,
+        0, /* EOL   */
+#endif /* GAS Type  */
+    };
+
+/* Anode 2 is throttled, it looks up its sequence from the throttle module*/
+#define NAME_CONDITION_ANODE2       "Anode2 Condition"
+#define ANODE2_DELAY                (1800 * DELAY_FACTOR)
+#define ANODE2_THROTTLE_SETPOINT    1 /* The second entry in the table */
