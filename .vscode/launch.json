@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "JLink Cortex Debug",
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceRoot}/build/bin/system-control-halo12-va41630-xenon-silver-boeing.elf",
+            "request": "launch",
+            "type": "cortex-debug",
+            "runToEntryPoint": "main",
+            "servertype": "jlink",
+            "serverpath": "/opt/SEGGER/JLink/JLinkGDBServerCLExe",
+            "device": "VA416XX",
+            "interface": "swd",
+            "serialNumber": "", //If you have more than one J-Link probe, add the serial number here.
+            "jlinkscript":"${workspaceRoot}/tools/jlink/JLinkSettings.JLinkScript",
+            "svdFile": "${workspaceRoot}/svd/va416xx-orig.svd",
+            "armToolchainPath": "/usr/share/gcc-arm-none-eabi-10.3-2021.10/bin",
+            "gdbTarget": "localhost:2331",
+        }
+    ]
+}

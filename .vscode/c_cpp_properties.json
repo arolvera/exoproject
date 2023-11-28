@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "name": "VA41630",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-arm",
+            "compilerPath": "${ARMGCC_PATH}/arm-none-eabi-gcc",
+            "compilerArgs": [
+                "-mcpu=cortex-m4",
+                "-mthumb"
+            ]
+        }
+    ],
+    "version": 4
+}
